@@ -43,12 +43,15 @@ With this Rails integration, you can create these asynchronous updates directly 
 
 The JavaScript for Turbo can either be run through the asset pipeline, which is included with this gem, or through the package that lives on NPM, through Webpacker.
 
-1. Add the `turbo-rails` gem to your Gemfile: `gem 'turbo-rails'`
-2. Run `./bin/bundle install`
-3. Run `./bin/rails turbo:install`
-4. Run `./bin/rails turbo:install:redis` to change the development Action Cable adapter from Async (the default one) to Redis. The Async adapter does not support Turbo Stream broadcasting.
+The installer will automatically choose whether to configure `turbo-rails` for the **asset pipeline** 
+or **Webpacker**.  
 
-Running `turbo:install` will install through NPM if Webpacker is installed in the application. Otherwise the asset pipeline version is used. To use the asset pipeline version, you must have `importmap-rails` installed first and listed higher in the Gemfile.
+- To use the **asset pipeline** version, you must install the [importmap-rails gem](https://github.com/rails/importmap-rails), and include
+  it in your `Gemfile` (or your `your_engine.gemspec` file) <u>before</u> the reference to the `turbo-rails` gem. The 
+  `importmap-rails` gem will create a `config/importmap.rb` file, which will be updated by this gem.
+- The installer will configure `turbo-rails` for **Webpacker** through NPM if it finds `package.json` file at the
+  top of your Rails app (or Engine).
+- You must use either the **asset pipeline** or **Webpacker** to use the `turbo-rails` gem.
 
 If you're using node and need to use the cable consumer, you can import [`cable`](https://github.com/hotwired/turbo-rails/blob/main/app/javascript/turbo/cable.js) (`import { cable } from "@hotwired/turbo-rails"`), but ensure that your application actually *uses* the members it `import`s when using this style (see [turbo-rails#48](https://github.com/hotwired/turbo-rails/issues/48)).
 
@@ -57,6 +60,34 @@ The `Turbo` instance is automatically assigned to `window.Turbo` upon import:
 ```js
 import "@hotwired/turbo-rails"
 ```
+
+### a) Install into a Rails application
+
+1. Add the `turbo-rails` gem to your Gemfile: `gem 'turbo-rails'`
+2. Run `./bin/bundle install`
+3. Run `./bin/rails turbo:install`
+4. Run `./bin/rails turbo:install:redis` to change the development Action Cable adapter from Async (the default one) 
+   to Redis. The Async adapter does not support Turbo Stream broadcasting.
+
+### b) Install into a Rails Engine or Gem
+
+1. Add the `turbo-rails` gem to your .gemspec file: 
+   ```ruby
+    spec.add_dependency 'turbo-rails'
+   ```
+2. Add the following to your `lib/your_engine/engine.rb` file:
+    ```ruby
+    require 'turbo-rails'
+    ```
+3. OPTIONAL: If you wish to use a non-standard version of this gem, you will also need 
+   to add a line to your engine/gem's `Gemfile`:
+    ```ruby
+    gem 'turbo-rails', github: 'repo_name/turbo-rails', branch: 'your-special-branch'
+    ```
+5. Run `./bin/bundle install`
+6. Run `./bin/rails app:turbo:install`
+7. Run `./bin/rails app:turbo:install:redis` to change the development Action Cable adapter from Async (the default 
+   setup) to Redis. The Async adapter does not support Turbo Stream broadcasting.
 
 
 ## Usage
