@@ -4,7 +4,7 @@
 # attention on the correct destination, particularly when installing into a RailsEngine.
 rails_root = Pathname.new(Rails.root.to_s.split(%r{\/(spec|test)\/dummy}).first)
 
-def namespace_from_task(task_name)
+def turbo_namespace_from_task(task_name)
   task_name.name.split(/turbo:install/).first
 end
 
@@ -27,7 +27,7 @@ end
 namespace :turbo do
   desc "Install Turbo into the app"
   task :install do |task|
-    namespace = namespace_from_task(task)
+    namespace = turbo_namespace_from_task(task)
     if rails_root.join("config/importmap.rb").exist?
       Rake::Task["#{namespace}turbo:install:importmap"].invoke
     elsif rails_root.join("package.json").exist?
@@ -40,21 +40,21 @@ namespace :turbo do
   namespace :install do
     desc "Install Turbo into the app with asset pipeline"
     task :importmap do |task|
-      namespace = namespace_from_task(task)
+      namespace = turbo_namespace_from_task(task)
       run_turbo_install_template(namespace, "turbo_with_importmap")
       switch_on_redis_if_available(namespace)
     end
 
     desc "Install Turbo into the app with webpacker"
     task :node do |task|
-      namespace = namespace_from_task(task)
+      namespace = turbo_namespace_from_task(task)
       run_turbo_install_template(namespace, "turbo_with_node")
       switch_on_redis_if_available(namespace)
     end
 
     desc "Switch on Redis and use it in development"
     task :redis do |task|
-      namespace = namespace_from_task(task)
+      namespace = turbo_namespace_from_task(task)
       run_turbo_install_template(namespace, "turbo_needs_redis")
     end
   end
